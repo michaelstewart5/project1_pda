@@ -6,7 +6,7 @@
 marathon_dates.csv
 course_record.csv
 project1.csv
-aqi_vals.csv
+aqi_values.csv
 
 # Session Data files
 .RData
