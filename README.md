@@ -1,8 +1,5 @@
 # Project 1: Examining the Impact of Environmental and Demographic Factors on Marathon Performance: An Exploratory Data Analysis
 
-![nyc_marathon](https://github.com/user-attachments/assets/ae5b1452-5915-4be0-a28a-b707e2f56d60)
-
-
 ## Overview
 
 This project, conducted in collaboration with Dr. Brett Romano Ely and Dr. Matthew Ely from Providence College, examines the effects of environmental conditions and demographic factors on marathon performance across age and gender. 
