@@ -9,6 +9,10 @@ This project, conducted in collaboration with Dr. Brett Romano Ely and Dr. Matth
 - **Weather Impact**: Assess how environmental conditions affect performance.
 - **Key Variables**: Identify the most impactful weather factors.
 
+## Data
+
+The data includes marathon performance from five major marathons (Boston, New York, Chicago, Twin Cities, Grandma's), along with corresponding weather conditions (temperature, humidity, WBGT) and air quality metrics (ozone levels in PPM).
+
 ## Key Files
 
 - `project1_pda.qmd`: Quarto file containing the raw code, analysis, and interpretations.
