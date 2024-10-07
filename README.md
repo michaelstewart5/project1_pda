@@ -11,8 +11,8 @@ This project, conducted in collaboration with Dr. Brett Romano Ely and Dr. Matth
 
 ## Key Files
 
-`project1_pda.qmd`: Quarto file containing the raw code, analysis, and interpretations.
-`project1_pda.pdf`: Final report summarizing the findings and interpretations.
+- `project1_pda.qmd`: Quarto file containing the raw code, analysis, and interpretations.
+- `project1_pda.pdf`: Final report summarizing the findings and interpretations.
 
 
 ## Dependencies:
