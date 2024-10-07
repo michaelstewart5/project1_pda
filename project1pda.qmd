@@ -431,7 +431,7 @@ avg_percent_age <- cleaned_df %>%
   group_by(age, sex) %>%
   summarise(avg_percent_cr = mean(percent_cr, na.rm = TRUE), .groups = 'drop')
 
-# Calculate the average time (minutes) for each age, sex, and race
+# calculate the average time each age, sex, and race
 avg_time_age <- cleaned_df %>%
   group_by(age, sex, race) %>%
   summarise(avg_time = mean(time_min, na.rm = TRUE), .groups = 'drop')
@@ -767,9 +767,11 @@ The environmental conditions, particularly WBGT and flag conditions, played a si
 
 Interestingly, our analysis showed no significant relationship between ozone levels and marathon performance. This could be due to generally lower ozone levels during the events or the brief exposure time for runners.
 
-Future research should delve deeper into the physiological mechanisms driving these performance declines, particularly the gendered responses to heat and age. As climate change intensifies, it will also be critical to examine how rising temperatures and increasingly erratic weather conditions may further impact marathon performance and athlete safety.
+Future research could look into the physiological mechanisms driving performance declines, particularly the gendered responses to heat and age. As climate change intensifies, it will also be critical to examine how rising temperatures and increasingly erratic weather conditions may further impact marathon performance and the safety of runners.
 
-# code appendix
+\newpage
+
+# Code appendix
 
 ```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
 
