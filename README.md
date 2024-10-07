@@ -9,6 +9,11 @@ This project, conducted in collaboration with Dr. Brett Romano Ely and Dr. Matth
 - **Weather Impact**: Assess how environmental conditions affect performance.
 - **Key Variables**: Identify the most impactful weather factors.
 
+## Key Files
+
+`project1_pda.qmd`: Quarto file containing the raw code, analysis, and interpretations.
+`project1_pda.pdf`: Final report summarizing the findings and interpretations.
+
 
 ## Dependencies:
 The project uses R (version 4.2.3) for analysis. The following R packages are required:
