@@ -11,9 +11,9 @@ editor: visual
 
 # Introduction
 
-This project, conducted in collaboration with Dr. Brett Romano Ely and Dr. Matthew Ely from Providence College, examines the effects of environmental conditions on marathon performance across age and gender. The dataset includes performances from five major marathons (Boston, New York, Chicago, Twin Cities, Grandma's) with detailed environmental data such as temperature, humidity, WBGT, and air quality, for athletes aged 14 to 85.
+This project, conducted in collaboration with Dr. Brett Romano Ely and Dr. Matthew Ely from Providence College, examines the effects of environmental conditions on marathon performance across age and gender. The dataset includes performances from five major marathons (Boston, New York, Chicago, Twin Cities, Grandma's) with detailed environmental data such as temperature, humidity, WBGT, and air quality, for 11,564 athletes aged 14 to 85.
 
-Through exploratory data analysis, we aimed to investigate three main objectives: first, to assess the effects of aging on marathon performance in men and women; second, to explore how environmental conditions such as temperature and air quality affect performance; and third, to identify which specific environmental factors, including WBGT and temperature, have the greatest impact on performance. Hypotheses suggest that older athletes and women may experience more significant declines in performance under adverse conditions. Statistical analyses, including ANOVA and correlation analysis, were employed to examine these relationships and provide insight into the interaction between age, gender, and environmental factors in endurance performance.
+Through exploratory data analysis, we aimed to investigate three main objectives: first, to assess the effects of aging on marathon performance in men and women; second, to explore how environmental conditions such as temperature and air quality affect performance; and third, to identify which specific environmental factors, including WBGT and temperature, have the greatest impact on performance. Our hypotheses suggest that older athletes and women may experience more significant declines in performance under adverse conditions. Statistical analyses, including ANOVA and correlation analysis, were employed to examine these relationships and provide insight into the interaction between age, gender, and environmental factors in endurance performance.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE, 
@@ -144,7 +144,7 @@ merged_df <- merged_df %>%
 
 ## Missing Data Handling
 
-Missing weather data were addressed through a complete case analysis, removing rows with missing values for key environmental variables, such as wet bulb temperature, dry bulb temperature, relative humidity, and air quality (ozone PPM). The proportion of missing data was minimal, accounting for only 4.25% of total observations, as shown in **Table 0**. For instance, in 2011, the Chicago marathon had 126 missing observations (1.09%), New York had 131 (1.13%), and Twin Cities had 118 (1.02%). Duluth (Grandma’s) marathon in 2012 had 116 missing values (1.00%). Given the relatively small percentage of missing data, this approach ensured the integrity of the data set while avoiding unnecessary complexity in imputation.
+Missing weather data were addressed through a complete case analysis, removing rows with missing values for key environmental variables, such as wet bulb temperature, dry bulb temperature, relative humidity, and air quality (ozone PPM). The proportion of missing data was minimal, accounting for only 4.25% of total observations, as shown in **Table 0**. For instance, in 2011, the Chicago marathon had 126 missing observations (1.09%), New York had 131 (1.13%), and Twin Cities had 118 (1.02%). Duluth (Grandma’s) marathon in 2012 had 116 missing values (1.00%). Given the relatively small percentage of missing data, this approach ensured the integrity of the data set while avoiding unnecessary complexity in imputation. Dropping these missing values yielded 11,073 participants left to be analyzed.
 
 ```{r}
 
@@ -424,7 +424,7 @@ tukey_sex_table
 
 Further analysis, as visualized in **Figure 1.2**, shows that peak performance age varies between men and women across different races. Men tend to reach their peak performance around 28-30 years old, and women tend to reach there peak around 28 to 36 years. One particularly interesting finding is that in Duluth, women’s best performance age extends to 36 years. This six-year gap compared to men, who generally peak around 29, raises questions about whether the summer conditions in Duluth might contribute to this outlier. This suggests that gender differences in thermoregulation may play a role in women reaching their peak later in Duluth races. Overall, the 26-35 age bin is the period of fastest marathon times for both men and women.
 
-```{r fig.width=10, fig.height=7}
+```{r fig.width=9, fig.height=6}
 
 # average percent_cr for each age and sex
 avg_percent_age <- cleaned_df %>%
@@ -768,6 +768,18 @@ The environmental conditions, particularly WBGT and flag conditions, played a si
 Interestingly, our analysis showed no significant relationship between ozone levels and marathon performance. This could be due to generally lower ozone levels during the events or the brief exposure time for runners.
 
 Future research could look into the physiological mechanisms driving performance declines, particularly the gendered responses to heat and age. As climate change intensifies, it will also be critical to examine how rising temperatures and increasingly erratic weather conditions may further impact marathon performance and the safety of runners.
+
+# References:
+
+1.  Ely, B. R., Cheuvront, S. N., Kenefick, R. W., & Sawka, M. N. (2010). Aerobic performance is degraded, despite modest hyperthermia, in hot environments. Med Sci Sports Exerc, 42(1), 135-41.
+
+2.  Ely, M. R., Cheuvront, S. N., Roberts, W. O., & Montain, S. J. (2007). Impact of weather on marathon-running performance. Medicine and science in sports and exercise, 39(3), 487-493.
+
+3.  Kenney, W. L., & Munce, T. A. (2003). Invited review: aging and human temperature regulation. Journal of applied physiology, 95(6), 2598-2603.
+
+4.  Besson, T., Macchi, R., Rossi, J., Morio, C. Y., Kunimasa, Y., Nicol, C., ... & Millet, G. Y. (2022). Sex differences in endurance running. Sports medicine, 52(6), 1235-1257.
+
+5.  Yanovich, R., Ketko, I., & Charkoudian, N. (2020). Sex differences in human thermoregulation: relevance for 2020 and beyond. Physiology, 35(3), 177-184.
 
 \newpage
 
