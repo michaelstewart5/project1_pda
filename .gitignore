@@ -2,11 +2,11 @@
 .Rhistory
 .Rapp.history
 
-*csv
-marathon_dates.csv
-course_record.csv
-project1.csv
-aqi_vals.csv
+**csv
+*marathon_dates.csv
+*course_record.csv
+*project1.csv
+*aqi_vals.csv
 
 # Session Data files
 .RData
