@@ -340,7 +340,16 @@ The ANOVA results (**Table 1.2**) show that both age and sex have statistically 
 ```{r}
 
 # anova model with interaction between sex, age bin, and flag
-anova_model_interaction <- aov(time_min ~ sex * age_bin * flag, data = cleaned_df)
+anova_model_interaction <- aov(time_min ~ sex + age_bin + flag, data = cleaned_df)
+
+anovamodel1 <- aov(time_min ~ flag, data = cleaned_df)
+anovamodel1
+
+anovamodel2 <- aov(time_min ~ age_bin, data = cleaned_df)
+anovamodel2 
+
+anovamodel3 <- aov(time_min ~ sex, data = cleaned_df)
+anovamodel3
 
 # anova summary
 anova_summary_interaction <- summary(anova_model_interaction)
@@ -420,6 +429,8 @@ tukey_sex_table <- tukey_results_sex %>%
 
 tukey_sex_table
 
+
+
 ```
 
 Further analysis, as visualized in **Figure 1.2**, shows that peak performance age varies between men and women across different races. Men tend to reach their peak performance around 28-30 years old, and women tend to reach there peak around 28 to 36 years. One particularly interesting finding is that in Duluth, women’s best performance age extends to 36 years. This six-year gap compared to men, who generally peak around 29, raises questions about whether the summer conditions in Duluth might contribute to this outlier. This suggests that gender differences in thermoregulation may play a role in women reaching their peak later in Duluth races. Overall, the 26-35 age bin is the period of fastest marathon times for both men and women.
@@ -459,7 +470,7 @@ age_time_avg <- ggplot(avg_time_age, aes(x = age, y = avg_time, color = sex)) +
   geom_hline(data = min_time_by_sex_race, aes(yintercept = min_time, color = sex), linetype = "dashed") +  # Horizontal dashed line
   geom_text(data = min_time_by_sex_race, 
             aes(x = min_age, y = min_time, label = paste0(sex, " Min Age: ", min_age)),
-            hjust = -1.6, vjust = 0, color = "black", size = 3.25, family = "serif") +  
+            hjust = -1.5, vjust = 0, color = "black", size = 3.25, family = "serif") +  
   facet_wrap(~race) +  # Facet by race
   labs(x = "Age", y = "Average Marathon Time (minutes)", 
        title = "Figure 1.2: Average Marathon Performance by Age and Race",
@@ -508,45 +519,44 @@ For Aim 2, the goal was to determine how environmental factors influence maratho
 **Table 2.1** displays some summary statistics for all related weather variables.
 
 ```{r}
-# summarize the weather data by race
+# Summarize the weather data by race
 weather_summary_race <- cleaned_df %>%
   group_by(race) %>%
   summarize(
-    wb_temp = paste0(round(median(wb_temp, na.rm = TRUE), 1), " (", 
-                     round(quantile(wb_temp, 0.25, na.rm = TRUE), 1), ",", 
-                     round(quantile(wb_temp, 0.75, na.rm = TRUE), 1), ")"),
-    db_temp = paste0(round(median(db_temp, na.rm = TRUE), 1), " (", 
-                     round(quantile(db_temp, 0.25, na.rm = TRUE), 1), ",", 
-                     round(quantile(db_temp, 0.75, na.rm = TRUE), 1), ")"),
-    rel_humid = paste0(round(median(rel_humid, na.rm = TRUE), 1), " (", 
-                       round(quantile(rel_humid, 0.25, na.rm = TRUE), 1), ",",
-                       round(quantile(rel_humid, 0.75, na.rm = TRUE), 1), ")"),
-    solar_rad = paste0(round(median(solar_rad, na.rm = TRUE), 1), " (", 
-                       round(quantile(solar_rad, 0.25, na.rm = TRUE), 1), ",", 
-                       round(quantile(solar_rad, 0.75, na.rm = TRUE), 1), ")"),
-    wind = paste0(round(median(wind, na.rm = TRUE), 1), " (", 
-                  round(quantile(wind, 0.25, na.rm = TRUE), 1), ",", 
-                  round(quantile(wind, 0.75, na.rm = TRUE), 1), ")"),
-    WBGT = paste0(round(median(WBGT, na.rm = TRUE), 1), " (", 
-                  round(quantile(WBGT, 0.25, na.rm = TRUE), 1), ",", 
-                  round(quantile(WBGT, 0.75, na.rm = TRUE), 1), ")")
+    `WBT (°C)` = paste0(round(median(wb_temp, na.rm = TRUE), 1), " (", 
+                         round(quantile(wb_temp, 0.25, na.rm = TRUE), 1), ",", 
+                         round(quantile(wb_temp, 0.75, na.rm = TRUE), 1), ")"),
+    `DBT (°C)` = paste0(round(median(db_temp, na.rm = TRUE), 1), " (", 
+                         round(quantile(db_temp, 0.25, na.rm = TRUE), 1), ",", 
+                         round(quantile(db_temp, 0.75, na.rm = TRUE), 1), ")"),
+    `RH (%)` = paste0(round(median(rel_humid, na.rm = TRUE), 1), " (", 
+                      round(quantile(rel_humid, 0.25, na.rm = TRUE), 1), ",", 
+                      round(quantile(rel_humid, 0.75, na.rm = TRUE), 1), ")"),
+    `SR (W/m²)` = paste0(round(median(solar_rad, na.rm = TRUE), 1), " (", 
+                         round(quantile(solar_rad, 0.25, na.rm = TRUE), 1), ",", 
+                         round(quantile(solar_rad, 0.75, na.rm = TRUE), 1), ")"),
+    `Wind (m/s)` = paste0(round(median(wind, na.rm = TRUE), 1), " (", 
+                          round(quantile(wind, 0.25, na.rm = TRUE), 1), ",", 
+                          round(quantile(wind, 0.75, na.rm = TRUE), 1), ")"),
+    `WBGT (°C)` = paste0(round(median(WBGT, na.rm = TRUE), 1), " (", 
+                          round(quantile(WBGT, 0.25, na.rm = TRUE), 1), ",", 
+                          round(quantile(WBGT, 0.75, na.rm = TRUE), 1), ")")
   )
 
-# create the gt table for weather summary by race
-weather_gt_table <- weather_summary_race %>%
+# Transpose the summarized data
+transposed_summary <- weather_summary_race %>%
+  pivot_longer(cols = -race, names_to = "Weather Variable", values_to = "Value") %>%
+  pivot_wider(names_from = race, values_from = Value)
+
+# Create a gt table from the transposed data
+transposed_gt_table <- transposed_summary %>%
   gt() %>%
   tab_header(
-    title = "Table 2.1: Weather Summary by Race",
+    title = "Weather Summary by Race",
     subtitle = "Median (IQR) of Weather Variables"
   ) %>%
   cols_label(
-    race = "Race",
-    wb_temp = "WBT (°C)",
-    db_temp = "DBT (°C)",
-    rel_humid = "RH (%)",
-    solar_rad = "SR (W/m²)",
-    wind = "Wind (m/s)",
-    WBGT = "WBGT (°C)"
+    `Weather Variable` = "Weather Variable"
   ) %>%
   tab_style(
     style = cell_text(weight = "bold", align = "center"),
@@ -560,32 +570,36 @@ weather_gt_table <- weather_summary_race %>%
   tab_footnote(
     footnote = "WBT: Wet Bulb Temp, DBT: Dry Bulb Temp, RH: Relative Humidity, 
     SR: Solar Radiation, WBGT: Wet Bulb Globe Temp",
-    locations = cells_column_labels(columns = c("wb_temp", "db_temp", 
-                                                "rel_humid", "solar_rad", 
-                                                "wind", "WBGT"))
+    locations = cells_column_labels(columns = everything())
   ) %>%
   tab_style(
     style = cell_text(size = px(10)), 
     locations = cells_footnotes()
   )
 
+# View the transposed gt table
+transposed_gt_table
 
-weather_gt_table
 
+library(gt)
+library(webshot2)
+
+# Save the gt table as a PNG
+gtsave(
+  data = transposed_gt_table,
+  filename = "transposed_weather_summary.png"
+)
 ```
 
-From this table, we can see some differences in weather conditions across different races. For example, Duluth (Grandma's), held during the summer, consistently experiences the highest median wet bulb temperature (14.3°C) and dry bulb temperature (18.1°C), along with the highest wet bulb globe temperature (WBGT) at 18.1°C. This race also has the highest relative humidity (60.3%), which, combined with high solar radiation and temperatures, suggests more challenging conditions for runners compared to other races. By contrast, New York and Boston races tend to have windier conditions, with median wind speeds of 11 and 12 m/s, respectively, compared to other races. These factors highlight Duluth’s more intense environmental conditions, which may contribute to longer marathon times due to heat and humidity. We further explored the relationship between weather and marathon performance in **Figure 2.1**, where we incorporated flag conditions as a categorical representation of WBGT. Flag conditions serve as indicators of temperature-related risk, with white flags representing the coldest conditions, followed by green for moderate conditions, yellow for warmer, and red for the hottest and most hazardous conditions. The differences in weather conditions across races, particularly Duluth's harsher environment, may impact runners' performance and influence the distribution of flag conditions.
+From this table, we can see some differences in weather conditions across different races. For example, Duluth (Grandma's), held during the summer, consistently experiences the highest median wet bulb temperature (14.3°C) and dry bulb temperature (18.1°C), along with the highest wet bulb globe temperature (WBGT) at 18.1°C. This race also has the highest relative humidity (60.3%), which, combined with high solar radiation and temperatures, suggests more challenging conditions for runners compared to other races. By contrast, New York and Boston races tend to have windier conditions, with median wind speeds of 11 and 12 m/s, respectively, compared to other races. These factors highlight Duluth’s more intense environmental conditions, which may contribute to longer marathon times due to heat and humidity. We further explored the relationship between weather and marathon performance in **Figure 2.1**, where we incorporated flag conditions as a categorical representation of WBGT. Flag conditions serve as indicators of temperature-related risk, with white flags representing the coldest conditions, followed by green for moderate conditions, yellow for warmer, and red for the hottest and most hazardous conditions. The differences in weather conditions across races, particularly Duluth's harsher environment, may impact runners' performance and influence the distribution of flag conditions.
 
 ```{r fig.width=10, fig.height=7}
-# revise flag colors with more distinct and visible names
-flag_colors <- c("White" = "#C1B8FF",
-                 "Green" = "#005A36",
-                 "Yellow" = "#FFEA65",
-                 "Red" = "#BE398D")
+cleaned_df <- cleaned_df %>%
+  mutate(flag = factor(flag, levels = c("White", "Green", "Yellow", "Red")))
 
-# boxplot with age bins and flag color
+# Create the boxplot with ordered legend
 boxplot_age_bin <- ggplot(cleaned_df, aes(x = age_bin, y = percent_cr, fill = flag)) +
-  geom_boxplot(outlier.size = 0.5, size = 0.25)+
+  geom_boxplot(outlier.size = 0.5, size = 0.25) +
   facet_wrap(~race, ncol = 2) +  # Facet by race
   scale_fill_manual(values = flag_colors) +
   labs(title = "Figure 2.1: Marathon Performance by Age Bin and Flag Condition",
@@ -713,6 +727,50 @@ corr_race_plot <- ggplot(correlations_by_race, aes(x = weather_var, y = correlat
   theme_classic(base_family = "serif") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom")
 
+
+corr_race_plot
+# Function to calculate Fisher z-transformed confidence intervals
+cor_with_ci <- function(x, y) {
+  n <- sum(!is.na(x) & !is.na(y))  # Number of complete observations
+  r <- cor(x, y, use = "complete.obs")  # Correlation coefficient
+  fisher_z <- atanh(r)  # Fisher z-transformation
+  se <- 1 / sqrt(n - 3)  # Standard error
+  ci_lower <- tanh(fisher_z - 1.96 * se)  # Lower bound
+  ci_upper <- tanh(fisher_z + 1.96 * se)  # Upper bound
+  data.frame(correlation = r, ci_lower = ci_lower, ci_upper = ci_upper)
+
+}
+
+# Calculate correlations and confidence intervals by race and weather variable
+correlations_with_ci <- cleaned_df %>%
+  group_by(race) %>%
+  summarize(
+    wb_temp = cor_with_ci(time_min, wb_temp),
+    db_temp = cor_with_ci(time_min, db_temp),
+    rel_humid = cor_with_ci(time_min, rel_humid),
+    solar_rad = cor_with_ci(time_min, solar_rad),
+    wind = cor_with_ci(time_min, wind),
+    WBGT = cor_with_ci(time_min, WBGT)
+  ) %>%
+  pivot_longer(cols = -race, names_to = "weather_var", values_to = "correlation_data") %>%
+  unnest(correlation_data)
+
+corr_race_plot <- ggplot(correlations_with_ci, aes(x = weather_var, y = correlation, fill = race)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_errorbar(
+    aes(ymin = ci_lower, ymax = ci_upper), 
+    position = position_dodge(width = 0.9), 
+    width = 0.2
+  ) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black", size = 0.5) +
+  scale_fill_manual(values = race_colors) +
+  labs(
+    title = "Figure 3.2: Correlations Between Weather Variables and Marathon Times",
+    x = "Weather Variable",
+    y = "Correlation with Marathon Time"
+  ) +
+  theme_classic(base_family = "serif") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "bottom")
 
 corr_race_plot
 
