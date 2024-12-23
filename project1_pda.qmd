@@ -9,11 +9,23 @@ format:
 editor: visual
 ---
 
+# Abstract
+
+This study investigates the impact of age, gender, and environmental conditions on marathon performance using data from 11,564 athletes aged 14 to 85 across five major races: Boston, Chicago, New York, Twin Cities, and Duluth (Grandma’s). The analysis aimed to explore three key objectives: (1) the effects of aging on marathon performance in men and women, (2) the influence of environmental factors, such as weather and air quality, on performance, and (3) the identification of the most impactful environmental factors.
+
+Results demonstrate that marathon performance peaks for both men and women in the 26-35 age range, with performance declining progressively in older age groups. Gender differences were evident, with men consistently outperforming women across all age bins. This gender gap became more pronounced in older groups, especially in the 65+ age category. Notably, in Duluth’s summer marathon, women appeared to reach peak performance six years later than men, suggesting potential gendered differences in thermoregulation and heat adaptation.
+
+Environmental factors, particularly WBGT and race-day flag conditions, significantly influenced marathon performance. Red flag conditions, representing the most severe weather, were associated with the largest performance declines, especially among older runners. By contrast, air quality, measured as ozone concentration, showed no significant relationship with performance, likely due to relatively low levels during race events. While WBGT and dry bulb temperature were the most impactful continuous variables, their effects were modest, highlighting the importance of categorical measures like flag conditions for assessing weather-related impacts.
+
 # Introduction
 
-This project, conducted in collaboration with Dr. Brett Romano Ely and Dr. Matthew Ely from Providence College, examines the effects of environmental conditions on marathon performance across age and gender. The dataset includes performances from five major marathons (Boston, New York, Chicago, Twin Cities, Grandma's) with detailed environmental data such as temperature, humidity, WBGT, and air quality, for 11,564 athletes aged 14 to 85.
+This project, conducted in collaboration with Dr. Brett Romano Ely and Dr. Matthew Ely from Providence College, examines the effects of environmental conditions on marathon performance across age and gender. The dataset includes performances from five major marathons (Boston, New York, Chicago, Twin Cities, Grandma’s) with detailed environmental data such as temperature, humidity, WBGT (wet bulb globe temperature), and air quality, for 11,564 athletes aged 14 to 85.
 
-Through exploratory data analysis, we aimed to investigate three main objectives: first, to assess the effects of aging on marathon performance in men and women; second, to explore how environmental conditions such as temperature and air quality affect performance; and third, to identify which specific environmental factors, including WBGT and temperature, have the greatest impact on performance. Our hypotheses suggest that older athletes and women may experience more significant declines in performance under adverse conditions. Statistical analyses, including ANOVA and correlation analysis, were employed to examine these relationships and provide insight into the interaction between age, gender, and environmental factors in endurance performance.
+Marathon performance is influenced by a complex interplay of physiological, demographic, and environmental factors. Previous research has demonstrated that marathon performance declines with age, with peak performance typically occurring in the late 20s to early 30s for both men and women (Ely et al., 2010). However, the rate and extent of decline differ between genders, potentially due to physiological differences such as muscle mass, endurance capacity, and thermoregulatory efficiency (Besson et al., 2022; Yanovich et al., 2020). This study extends these findings by investigating how aging impacts men and women differently, particularly under varying environmental conditions.
+
+Environmental stressors such as heat, humidity, and solar radiation can significantly affect endurance performance, with WBGT emerging as a critical measure of heat stress (Kenney & Munce, 2003). For example, races held in summer conditions, such as Duluth (Grandma’s Marathon), often pose unique challenges due to higher temperatures and humidity levels. While men generally outperform women in endurance events, women’s thermoregulatory advantages under heat stress may allow them to sustain performance under moderate conditions, as observed in other studies (Ely et al., 2007). This study also incorporates air quality measures, specifically ozone concentration, as prior research has suggested potential respiratory limitations associated with air pollution during endurance activities.
+
+Through exploratory data analysis, we investigated three main objectives. First, we assessed the effects of aging on marathon performance in men and women. Second, we explored how environmental conditions, including temperature, humidity, and air quality, impact performance. Third, we identified which environmental factors, such as WBGT and temperature, exert the greatest influence on performance outcomes. Statistical analyses, including the Kruskal-Wallis test and pairwise Wilcoxon comparisons, were employed to evaluate these relationships. These non-parametric methods were selected to account for the non-normality of the data and unequal variances across groups. This approach provides robust insights into the interaction between age, gender, and environmental conditions in shaping endurance performance outcomes.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(warning = FALSE, 
@@ -88,11 +100,12 @@ merged_df <- merged_df %>%
   ) %>%
   mutate(race = race_map.1[race])
 
-# create age bins
 merged_df <- merged_df %>%
-  mutate(age_bin = cut(age, breaks = c(0, 17, 25,35,45,55,65, Inf),
+  mutate(age_bin = cut(age, 
+                       breaks = c(0, 18, 26, 36, 46, 56, 65, Inf),
                        labels = c("< 18", "18-25", "26-35", "36-45", 
-                                  "46-55", "56-64", "65+")))
+                                  "46-55", "56-64", "65+"),
+                       right = FALSE))
 
 # ensure race names are consistent between marathon_dates and merged_df
 marathon_dates <- marathon_dates %>%
@@ -232,7 +245,7 @@ missing_weather_table
 
 The dataset was comprised of marathon performance data from five major races, along with corresponding environmental conditions, including air quality measures. Marathon performance data were merged with course records, race dates, and air quality data. The primary air quality variable, ozone concentration, was measured in parts per million (PPM) and calculated as an 8-hour average for each race-year. We chose PPM over micrograms per cubic meter because PPM is the standard unit for measuring gas concentrations like ozone, whereas micrograms per cubic meter is typically used for particulate matter such as PM2.5. The 8-hour average was selected to better reflect longer-term exposure during marathon events, as opposed to shorter-term (e.g., 1-hour) measurements, which may not capture the full extent of air quality conditions experienced by runners throughout the race. This approach provided a standardized metric for comparing air quality across different races and years.
 
-To ensure comparability across different analyses, marathon times were treated in two distinct ways depending on the context. When analyses did not group or facet by race, marathon times were represented in minutes, allowing for more straightforward and interpretable results. However, when grouping or comparing across races, percentcourse recordwas used (percent CR) to account for differences in race conditions and course difficulty. Percent CR standardizes a runner’s time as a percentage of the course record for each marathon. A value of 0% means the runner matched the course record, while positive values indicate slower times, and negative values represent faster times. This allows performance to be compared across different races and conditions.
+To ensure comparability across different analyses, marathon times were treated in two distinct ways depending on the context. When analyses did not group or facet by race, marathon times were represented in minutes, allowing for more straightforward and interpretable results. However, when grouping or comparing across races, percent course record was used (percent CR) to account for differences in race conditions and course difficulty. Percent CR standardizes a runner’s time as a percentage of the course record for each marathon. A value of 0% means the runner matched the course record, while positive values indicate slower times, and negative values represent faster times. This allows performance to be compared across different races and conditions.
 
 ```{r}
 ###### DATA CLEANING; DROP NAs ################## 
@@ -246,9 +259,128 @@ cleaned_df <- merged_df %>%
 
 Exploratory data analysis (EDA) focused on the relationship between marathon performance and the variables of interest: age, gender, and environmental conditions. Marathon times were analyzed using summary statistics and visualizations, such as boxplots, to explore trends across different age groups and genders. This analysis provided insights into how performance varied with age, with comparisons made across men and women.
 
-## Statistical Analysis
+## Testing Normality
 
-To assess the effects of environmental variables and demographic factors on marathon performance, a series of ANOVA models were employed. These models examined the influence of gender, age, and race-day flag conditions on performance times. Post-hoc Tukey tests were performed to identify significant pairwise differences across these groups. Interaction effects were also investigated between age and gender, as well as between age and flag conditions.
+The Shapiro-Wilk test results demonstrate that neither the raw data (percent_cr) nor the square root-transformed data (percent_cr_sqrt) meet the assumption of normality, with p-values consistently below 0.05 across all age bins. This indicates strong evidence of non-normality in the dataset, even after applying a square root transformation. The Q-Q plots further confirm this finding, as both the original and transformed data show clear deviations from the theoretical normal distribution. While the square root transformation mitigates some skewness, it does not adequately normalize the data.
+
+```{r}
+
+cleaned_df <- cleaned_df %>%
+  mutate(percent_cr_sqrt = sqrt(percent_cr))
+
+library(ggplot2)
+library(dplyr)
+library(car)
+
+# Density Plot
+density_plot <- ggplot(cleaned_df) +
+  geom_density(aes(x = percent_cr, fill = flag), alpha = 0.4) +
+  geom_density(aes(x = percent_cr_sqrt, fill = flag), alpha = 0.4, linetype = "dashed") +
+  facet_wrap(~race, scales = "free") +
+  theme_classic() +
+  labs(
+    title = "Density Plot of Marathon Performance by Age Bin and Race",
+    subtitle = "Solid: Original Scale, Dashed: Square Root Transformed",
+    x = "Marathon Performance (% Course Record)",
+    y = "Density"
+  ) +
+  theme(legend.position = "bottom")
+
+print(density_plot)
+
+# Q-Q Plot
+qq_plot <- ggplot(cleaned_df, aes(sample = percent_cr)) +
+  stat_qq(aes(color = "Original Scale")) +
+  stat_qq_line(aes(color = "Original Scale")) +
+  stat_qq(aes(sample = percent_cr_sqrt, color = "Square Root Transformed")) +
+  stat_qq_line(aes(sample = percent_cr_sqrt, color = "Square Root Transformed")) +
+  facet_wrap(~race) +
+  theme_classic() +
+  labs(
+    title = "Q-Q Plots of Marathon Performance by Race",
+    subtitle = "Original Scale vs. Square Root Transformed",
+    x = "Theoretical Quantiles",
+    y = "Sample Quantiles",
+    color = "Data Transformation"
+  )
+
+print(qq_plot)
+```
+
+Levene’s test results for homogeneity of variance reveal that the raw data meets this assumption, with a p-value of 0.618, indicating no significant differences in variance across groups. However, the square root-transformed data fails the test for homogeneity, with a p-value of 0.041, suggesting unequal variances among groups
+
+he density plots reinforce these conclusions, illustrating skewed distributions and potential outliers for both the original and square root-transformed data across races. Taken together, these results indicate that the assumptions required for parametric methods, such as ANOVA, are not satisfied. As a result, we will employ non-parametric methods, specifically the Kruskal-Wallis test and pairwise Wilcoxon tests, to assess group differences. These methods do not require normality or equal variances, making them more appropriate for the characteristics of this dataset.
+
+```{r}
+
+# Levene's Test
+levene_raw <- car::leveneTest(percent_cr ~ flag, data = cleaned_df)
+levene_sqrt <- car::leveneTest(percent_cr_sqrt ~ flag, data = cleaned_df)
+
+levene_results <- data.frame(
+  Test = c("Raw Data", "Square Root Transformed"),
+  F_statistic = c(levene_raw$`F value`[1], levene_sqrt$`F value`[1]),
+  P_value = c(levene_raw$`Pr(>F)`[1], levene_sqrt$`Pr(>F)`[1])
+)
+
+# 1. Shapiro-Wilk Test Results Table
+shapiro_results <- cleaned_df %>%
+  group_by(age_bin) %>%
+  summarize(
+    Raw_p = shapiro.test(percent_cr)$p.value,
+    Sqrt_p = shapiro.test(percent_cr_sqrt)$p.value
+  ) %>%
+  mutate(
+    Normality_Raw = ifelse(Raw_p < 0.05, "No", "Yes"),
+    Normality_Sqrt = ifelse(Sqrt_p < 0.05, "No", "Yes")
+  )
+
+shapiro_table <- shapiro_results %>%
+  gt() %>%
+  tab_header(
+    title = "Shapiro-Wilk Test Results for Normality",
+    subtitle = "Raw and Square Root Transformed Data"
+  ) %>%
+  cols_label(
+    age_bin = "Age Bin",
+    Raw_p = "Raw p-value",
+    Sqrt_p = "Sqrt p-value",
+    Normality_Raw = "Normality (Raw)",
+    Normality_Sqrt = "Normality (Sqrt)"
+  ) %>%
+  fmt_number(columns = c(Raw_p, Sqrt_p), decimals = 3)
+
+shapiro_table
+
+
+
+levene_results <- data.frame(
+  Test = c("Raw Data", "Square Root Transformed"),
+  F_statistic = c(levene_raw$`F value`[1], levene_sqrt$`F value`[1]),
+  P_value = c(levene_raw$`Pr(>F)`[1], levene_sqrt$`Pr(>F)`[1]),
+  Homogeneity = ifelse(c(levene_raw$`Pr(>F)`[1], levene_sqrt$`Pr(>F)`[1]) < 0.05, "No", "Yes")
+)
+
+levene_table <- levene_results %>%
+  gt() %>%
+  tab_header(
+    title = "Levene's Test Results for Homogeneity of Variance",
+    subtitle = "Raw and Square Root Transformed Data"
+  ) %>%
+  cols_label(
+    Test = "Data Type",
+    F_statistic = "F-Statistic",
+    P_value = "p-value",
+    Homogeneity = "Homogeneity of Variance"
+  ) %>%
+  fmt_number(columns = c(F_statistic, P_value), decimals = 3)
+
+levene_table
+```
+
+# Statistical Analysis
+
+To assess the effects of environmental variables and demographic factors on marathon performance, non-parametric methods were employed due to the non-normal distribution of the data and unequal variances across groups. Specifically, the Kruskal-Wallis test was used to examine the influence of gender, age, and race-day flag conditions on performance times. Pairwise Wilcoxon tests, with Bonferroni adjustment, were performed to identify significant differences between groups. These methods allowed for robust comparisons across demographic and environmental factors.
 
 # Results
 
@@ -335,101 +467,76 @@ marathon_summ_table
 
 ```
 
-The ANOVA results (**Table 1.2**) show that both age and sex have statistically significant effects on marathon times (p \< 0.001). Gender alone accounts for a large portion of the variance (F-value = 1306.618, p \< 0.001), and age also plays a significant role (F-value = 4112.184, p \< 0.001). Also, there is a significant interaction between gender and age (F-value = 33.917, p \< 0.001), suggesting that the rate of decline with age differs between men and women. The interaction between age and sex is also significant (p \< 0.001), indicating that the rate of performance decline with age differs between men and women. This interaction is further explored in the Tukey post-hoc analysis (**Table 1.3**), which shows that men outperform women across all age groups, with the largest differences observed in the oldest categories. For example, the difference between males and females in the 18-25 age group is −22.853 minutes (p \< 0.001), while the difference is even greater in the 65+ group, where females take, on average, 52.56 minutes longer to complete the marathon compared to males. Also, the fact that the difference between the 26-35 and 18-25 groups is smaller than those involving older groups (−22.534 minutes, p \< 0.0001) indicates that peak marathon performance falls within these ranges.
+The results of the Kruskal-Wallis test (Table 1.2) demonstrate that flag condition, age, and sex significantly influence marathon performance. Age bin exhibited the largest effect, with a chi-square value of 7,436.804 (p \< 0.001), underscoring the critical role of age in shaping marathon performance. These findings highlight the natural decline in performance with increasing age, which is consistent with previous studies. The significant chi-square value for sex (836.146, p \< 0.001) reflects well-documented differences in endurance performance between men and women, with men typically achieving faster times across most age bins. Flag condition also played a significant role, with a chi-square value of 61.851 (p \< 0.001), indicating that environmental severity affects marathon outcomes.
+
+The results of the pairwise Wilcoxon tests for age bins (Table 1.3) highlight significant differences in marathon performance between most age groups. Younger age bins (\<18, 18-25) consistently showed faster performances compared to older groups, with all comparisons yielding Bonferroni-adjusted p-values below 0.001. Performance differences were particularly pronounced when comparing middle-aged runners (36-45, 46-55) to older groups (56-64, 65+), reflecting the natural decline in endurance capabilities with age. Interestingly, the largest performance gaps were observed between the youngest (\<18) and oldest (65+) groups, underscoring the cumulative impact of aging on marathon times.
 
 ```{r}
 
-# anova model with interaction between sex, age bin, and flag
-anova_model_interaction <- aov(time_min ~ sex + age_bin + flag, data = cleaned_df)
+# Kruskal-Wallis Tests
+kw_flag <- kruskal.test(time_min ~ flag, data = cleaned_df)
+kw_age_bin <- kruskal.test(time_min ~ age_bin, data = cleaned_df)
+kw_sex <- kruskal.test(time_min ~ sex, data = cleaned_df)
 
-anovamodel1 <- aov(time_min ~ flag, data = cleaned_df)
-anovamodel1
 
-anovamodel2 <- aov(time_min ~ age_bin, data = cleaned_df)
-anovamodel2 
+# Pairwise Wilcoxon Tests
+pw_flag <- pairwise.wilcox.test(
+  cleaned_df$time_min,
+  cleaned_df$flag,
+  p.adjust.method = "bonferroni"
+)
 
-anovamodel3 <- aov(time_min ~ sex, data = cleaned_df)
-anovamodel3
+pw_age_bin <- pairwise.wilcox.test(
+  cleaned_df$time_min,
+  cleaned_df$age_bin,
+  p.adjust.method = "bonferroni"
+)
 
-# anova summary
-anova_summary_interaction <- summary(anova_model_interaction)
+pw_sex <- wilcox.test(time_min ~ sex, data = cleaned_df)
 
-# tukey's post-hoc test on sex, age_bin, and flag
-tukey_interaction <- TukeyHSD(anova_model_interaction)
 
-# extract anova results
-anova_results_interaction <- tidy(anova_model_interaction)
+# Format Kruskal-Wallis Results into a Table
+kw_results <- data.frame(
+  Variable = c("Flag", "Age Bin", "Sex"),
+  Chi_Squared = c(kw_flag$statistic, kw_age_bin$statistic, kw_sex$statistic),
+  p_value = c(kw_flag$p.value, kw_age_bin$p.value, kw_sex$p.value)
+)
 
-# anova gt table
-anova_table_interaction <- anova_results_interaction %>%
+kw_table <- kw_results %>%
+  gt() %>%
+  tab_header(title = "Table 1.2: Kruskal-Wallis Test Results") %>%
+  cols_label(
+    Variable = "Variable",
+    Chi_Squared = "Chi-Square",
+    p_value = "p-value"
+  ) %>%
+  fmt_number(columns = c(Chi_Squared, p_value), decimals = 3)
+
+kw_table
+
+# Pairwise Wilcoxon Test for Age Bins
+pw_age_bin <- pairwise.wilcox.test(
+  cleaned_df$time_min,
+  cleaned_df$age_bin,
+  p.adjust.method = "bonferroni"
+)
+
+pw_age_bin_table <- as.data.frame(pw_age_bin$p.value) %>%
+  rownames_to_column(var = "Comparison") %>%
+  pivot_longer(cols = -Comparison, names_to = "Group", values_to = "Adjusted_p") %>%
   gt() %>%
   tab_header(
-    title = "Table 1.2: ANOVA Results for Marathon Times by Flag Condition, Gender, and Age Bin"
+    title = "Table 1.3: Pairwise Wilcoxon Test Results for Age Bins",
+    subtitle = "Bonferroni-Adjusted p-values"
   ) %>%
   cols_label(
-    term = "Source",
-    df = "Df",
-    sumsq = "Sum Sq",
-    meansq = "Mean Sq",
-    statistic = "F-value",
-    p.value = "Pr(>F)"
+    Comparison = "Age Bin Comparison",
+    Group = "Group Compared",
+    Adjusted_p = "Adjusted p-value"
   ) %>%
-  fmt_number(
-    columns = c(sumsq, meansq),
-    decimals = 0
-  ) %>%
-  fmt_number(
-    columns = c(statistic, p.value),
-    decimals = 3
-  ) %>%
-  tab_options(
-    table.font.size = "medium",
-    heading.title.font.size = 16
-  ) %>%
-  cols_align(
-    align = "center",
-    columns = everything()
-  )
+  fmt_number(columns = "Adjusted_p", decimals = 3)
 
-
-anova_table_interaction
-
-# tukey post-hoc test
-tukey_flag <- TukeyHSD(anova_model_interaction, "flag")
-tukey_sex <- TukeyHSD(anova_model_interaction, "sex")
-tukey_age <- TukeyHSD(anova_model_interaction, "age_bin")
-
-# convert tukey results to data frames
-tukey_results_flag <- as.data.frame(tukey_flag$flag)
-tukey_results_sex <- as.data.frame(tukey_sex$sex)
-tukey_results_age <- as.data.frame(tukey_age$age_bin)
-
-# add comparison names to Tukey results
-tukey_results_flag$Comparison <- rownames(tukey_results_flag)
-tukey_results_sex$Comparison <- rownames(tukey_results_sex)
-tukey_results_age$Comparison <- rownames(tukey_results_age)
-
-tukey_sex_table <- tukey_results_sex %>%
-  gt() %>%
-  tab_header(
-    title = "Table 1.3: Tukey Post-Hoc Test Results for Sex",
-    subtitle = "95% Family-Wise Confidence Level"
-  ) %>%
-  cols_label(
-    Comparison = "Sex Comparison",
-    diff = "Difference",
-    lwr = "Lower Bound",
-    upr = "Upper Bound",
-    `p adj` = "Adjusted p-value"
-  ) %>%
-  fmt_number(
-    columns = c("diff", "lwr", "upr", "p adj"),
-    decimals = 3
-  )
-
-tukey_sex_table
-
-
+pw_age_bin_table
 
 ```
 
@@ -488,25 +595,6 @@ In summary, these results support the hypothesis that aging impacts marathon per
 
 ```{r fig.width=10, fig.height=7}
 
-tukey_age_table <- tukey_results_age %>%
-  gt() %>%
-  tab_header(
-    title = "Table 1.3: Tukey Post-Hoc Test Results for Age Bins",
-    subtitle = "95% Family-Wise Confidence Level"
-  ) %>%
-  cols_label(
-    Comparison = "Age Bin Comparison",
-    diff = "Difference",
-    lwr = "Lower Bound",
-    upr = "Upper Bound",
-    `p adj` = "Adjusted p-value"
-  ) %>%
-  fmt_number(
-    columns = c("diff", "lwr", "upr", "p adj"),
-    decimals = 3
-  )
-
-tukey_age_table
 
 ```
 
@@ -519,6 +607,11 @@ For Aim 2, the goal was to determine how environmental factors influence maratho
 **Table 2.1** displays some summary statistics for all related weather variables.
 
 ```{r}
+library(dplyr)
+library(tidyr)
+library(gt)
+library(webshot2)
+
 # Summarize the weather data by race
 weather_summary_race <- cleaned_df %>%
   group_by(race) %>%
@@ -543,20 +636,33 @@ weather_summary_race <- cleaned_df %>%
                           round(quantile(WBGT, 0.75, na.rm = TRUE), 1), ")")
   )
 
+# Summarize the flag counts and percentages
+flag_summary <- cleaned_df %>%
+  group_by(race, flag) %>%
+  summarize(flag_count = n(), .groups = "drop") %>%
+  group_by(race) %>%
+  mutate(flag_percent = round((flag_count / sum(flag_count)) * 100, 1)) %>%
+  mutate(flag_summary = paste0(flag, ": ", flag_count, " (", flag_percent, "%)")) %>%
+  summarize(flag_summary = paste(flag_summary, collapse = "; "), .groups = "drop")
+
+# Merge weather summary with flag summary
+merged_summary <- weather_summary_race %>%
+  left_join(flag_summary, by = "race")
+
 # Transpose the summarized data
-transposed_summary <- weather_summary_race %>%
-  pivot_longer(cols = -race, names_to = "Weather Variable", values_to = "Value") %>%
+transposed_summary <- merged_summary %>%
+  pivot_longer(cols = -race, names_to = "Weather and Flag Variables", values_to = "Value") %>%
   pivot_wider(names_from = race, values_from = Value)
 
 # Create a gt table from the transposed data
 transposed_gt_table <- transposed_summary %>%
   gt() %>%
   tab_header(
-    title = "Weather Summary by Race",
-    subtitle = "Median (IQR) of Weather Variables"
+    title = "Weather and Flag Summary by Race",
+    subtitle = "Median (IQR) of Weather Variables and Flag Summary"
   ) %>%
   cols_label(
-    `Weather Variable` = "Weather Variable"
+    `Weather and Flag Variables` = "Variables"
   ) %>%
   tab_style(
     style = cell_text(weight = "bold", align = "center"),
@@ -569,7 +675,7 @@ transposed_gt_table <- transposed_summary %>%
   ) %>%
   tab_footnote(
     footnote = "WBT: Wet Bulb Temp, DBT: Dry Bulb Temp, RH: Relative Humidity, 
-    SR: Solar Radiation, WBGT: Wet Bulb Globe Temp",
+    SR: Solar Radiation, WBGT: Wet Bulb Globe Temp. Flag Summary includes counts and percentages of each flag type.",
     locations = cells_column_labels(columns = everything())
   ) %>%
   tab_style(
@@ -580,14 +686,10 @@ transposed_gt_table <- transposed_summary %>%
 # View the transposed gt table
 transposed_gt_table
 
-
-library(gt)
-library(webshot2)
-
 # Save the gt table as a PNG
 gtsave(
   data = transposed_gt_table,
-  filename = "transposed_weather_summary.png"
+  filename = "transposed_weather_and_flag_summary.png"
 )
 ```
 
@@ -613,39 +715,11 @@ boxplot_age_bin <- ggplot(cleaned_df, aes(x = age_bin, y = percent_cr, fill = fl
   )
 
 boxplot_age_bin
+
+
 ```
 
 These results show that marathon times increase with age across all races, especially in the older age groups (65+). The red flags, indicating the hottest conditions, are generally associated with the highest marathon times, particularly in the 65+ age group, where there is considerable variation. The white and green flags, which represent cooler conditions, tend to have the fastest times across most age bins, highlighting the impact of favorable weather conditions on performance. We observe that New York does not have any races with red flags from the given years in the data, and Duluth does not have any white flag races. The latter is true, most likely because it takes place in the summer, where white flag conditions are extremely rare in that location. Also, we can see missingness in the \< 18 age group in New York and Boston, where one could infer that they are missing because one must be 18+ to qualify for those marathons, or perhaps there is some other reason we don;t observe people from that age range in our data. **Figure 2.2** further illustrates the differences in flag distributions across races.
-
-```{r fig.width=10, fig.height=7}
-
-# summarize flag
-flag_summary <- cleaned_df %>%
-  group_by(race, flag) %>%
-  summarize(flag_count = n()) %>%
-  ungroup() %>%
-  group_by(race) %>%
-  mutate(flag_percent = flag_count / sum(flag_count))
-
-
-# proportion of flags for each race bar plot
-prop_flag <- ggplot(flag_summary, aes(x = flag, y = flag_percent, fill = flag)) +
-  geom_bar(stat = "identity", width = 0.6, color = "black") +
-  geom_text(aes(label = scales::percent(flag_percent, accuracy = 1)), 
-            position = position_stack(vjust = 0.5), size = 3, family = "serif") +
-  labs(x = "Flag Condition", 
-       y = "Proportion of Flag Conditions", 
-       title = "Flag Conditions by Race", 
-       family = "serif") +
-  scale_fill_manual(values = flag_colors) +
-  facet_wrap(~race) +  
-  coord_flip() +
-  theme_classic(base_family = "serif") +
-  theme(legend.position = "none")
-
-prop_flag
-
-```
 
 ### Relationship Between Air Quality and Marathon Performance
 
@@ -776,29 +850,41 @@ corr_race_plot
 
 ```
 
-Moreover, the Tukey Post-Hoc Comparisons for Flag Conditions (**Table 3.1**) reinforced the importance of flag conditions in predicting marathon performance. Red flag conditions, representing the harshest weather, resulted in an average marathon time increase of 10.34 minutes compared to green flag conditions, while yellow flag conditions led to an average increase of 7.69 minutes. These differences were substantial across races, particularly in Duluth, where yellow flag conditions were most frequent. Interestly, the difference in performance times for runnners in yellow flag vs red flag conditions were not significantly different (adjusted p = 0.32)
+The pairwise Wilcoxon test results for flag conditions, with Bonferroni-adjusted p-values, reveal significant differences in marathon performance among several flag comparisons. Notably, the Red flag condition showed highly significant differences compared to all other flags, including White (p \< 0.0001), Green (p \< 0.0001), and Yellow (p = 0.0182). This indicates that the Red flag condition, representing the most severe weather conditions, is associated with the largest deviations in marathon performance. The Yellow flag also displayed significant differences when compared to the White flag (p = 0.0007), highlighting the impact of moderate weather conditions on performance. However, no significant differences were observed between Green and White flags (p = 0.1078) or between Yellow and Green flags (p = 0.1972), suggesting that performance differences under these conditions are less pronounced. These findings suggest that as weather conditions worsen, particularly under Red and Yellow flags, marathon performance is increasingly impacted, likely due to adverse environmental factors such as heat and humidity.
 
 ```{r}
 
-# tukey table for flag condition
-tukey_table_flag <- tukey_results_flag %>%
+# Perform Kruskal-Wallis test for flag conditions
+kw_test_flag <- kruskal.test(percent_cr ~ flag, data = cleaned_df)
+
+
+# Pairwise Wilcoxon test with Bonferroni correction
+wilcox_results_flag <- pairwise.wilcox.test(
+  cleaned_df$percent_cr,
+  cleaned_df$flag,
+  p.adjust.method = "bonferroni"
+)
+
+# Convert Wilcoxon test results to a tidy format
+wilcox_results_flag_tidy <- as.data.frame(as.table(wilcox_results_flag$p.value)) %>%
+  filter(!is.na(Freq)) %>% # Remove NA values
+  rename(Comparison = Var1, Group_Compared = Var2, Adjusted_P = Freq) %>%
+  mutate(Adjusted_P = round(Adjusted_P, 4)) # Round p-values
+
+
+wilcox_table_flag <- wilcox_results_flag_tidy %>%
   gt() %>%
   tab_header(
-    title = "Tukey Post-Hoc Comparisons for Flag Conditions"
+    title = "Pairwise Wilcoxon Comparisons for Flag Conditions",
+    subtitle = "Bonferroni-Adjusted P-values"
   ) %>%
   cols_label(
     Comparison = "Comparison",
-    diff = "Difference in Means",
-    lwr = "Lower Bound (95%)",
-    upr = "Upper Bound (95%)",
-    `p adj` = "Adjusted P-value"
+    Group_Compared = "Group Compared",
+    Adjusted_P = "Adjusted P-value"
   ) %>%
   fmt_number(
-    columns = c(diff, lwr, upr),
-    decimals = 2
-  ) %>%
-  fmt_number(
-    columns = `p adj`,
+    columns = Adjusted_P,
     decimals = 4
   ) %>%
   tab_options(
@@ -810,7 +896,9 @@ tukey_table_flag <- tukey_results_flag %>%
     columns = everything()
   )
 
-tukey_table_flag
+
+wilcox_table_flag
+
 ```
 
 When evaluating weather impact across age bins, older runners showed the greatest sensitivity to adverse weather. For instance, in the 65+ group, marathon times were significantly slower under red and yellow flag conditions, while younger age groups (such as 18-25) showed less variation in their times across flag categories (**Figure 2.1**). This difference highlights that flag conditions, particularly red and yellow flags, have a much more pronounced effect on older runners than on their younger counterparts.
@@ -827,6 +915,12 @@ Interestingly, our analysis showed no significant relationship between ozone lev
 
 Future research could look into the physiological mechanisms driving performance declines, particularly the gendered responses to heat and age. As climate change intensifies, it will also be critical to examine how rising temperatures and increasingly erratic weather conditions may further impact marathon performance and the safety of runners.
 
+# **Limitations**
+
+The methodological approach used in this study, while appropriate for the dataset and research objectives, has inherent limitations. First, the reliance on non-parametric methods, such as the Kruskal-Wallis and pairwise Wilcoxon tests, limits the ability to adjust for potential confounding variables or interactions between demographic and environmental factors. While these methods are robust against violations of normality and homogeneity of variances, they do not allow for the inclusion of covariates or the modeling of complex relationships that may influence marathon performance.
+
+Future research should consider employing more advanced statistical methods, such as multivariable regression or machine learning models, to account for potential confounders and interactions. ,
+
 # References:
 
 1.  Ely, B. R., Cheuvront, S. N., Kenefick, R. W., & Sawka, M. N. (2010). Aerobic performance is degraded, despite modest hyperthermia, in hot environments. Med Sci Sports Exerc, 42(1), 135-41.
@@ -841,7 +935,7 @@ Future research could look into the physiological mechanisms driving performance
 
 \newpage
 
-# Code appendix
+# Code Amoppendix
 
 ```{r ref.label=knitr::all_labels(), echo=TRUE, eval=FALSE}
 
